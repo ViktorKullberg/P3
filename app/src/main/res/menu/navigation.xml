@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <item
+        android:id="@+id/navigation1_merged"
+        android:icon="@drawable/ic_merged_black_24dp"
+        android:title="@string/title_nav2_group" />
+
+    <item
+        android:id="@+id/navigation2_twitter"
+        android:icon="@drawable/ic_twitter_filled_black_24dp"
+        android:title="@string/title_nav1_map" />
+
+    <item
+        android:id="@+id/navigation3_reddit"
+        android:icon="@drawable/ic_reddit_filled_black_24dp"
+        android:title="@string/title_nav3_chat" />
+
+</menu>

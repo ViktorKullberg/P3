@@ -1,0 +1,20 @@
+<resources>
+    <string name="app_name">Merged Feed</string>
+    <string name="title_nav1_map">Twitter</string>
+    <string name="title_nav2_group">Merged Feed</string>
+    <string name="title_nav3_chat">Reddit</string>
+
+    <string name="enter_user">Please enter user name…</string>
+    <string name="enter_pass">Please enter password…</string>
+
+    <string name="twitter_login">TWITTER LOGIN</string>
+    <string name="reddit_login">REDDIT LOGIN</string>
+    <string name="login">LOGIN</string>
+
+    <string name="username">"@Username"</string>
+    <string name="headline">Headline</string>
+    <string name="body">Body text text text not sure what this should look like but this is a placeholder for whatever we make this like later.</string>
+
+    <string name="version" translatable="false">version 0.0</string>
+
+</resources>
