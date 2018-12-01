@@ -48,6 +48,10 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         super.notifyDataSetChanged();
     }
 
+    public List<PostTest> getList(){
+        return this.content;
+    }
+
     @NonNull
     @Override
     public Holder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {

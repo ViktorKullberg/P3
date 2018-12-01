@@ -6,10 +6,17 @@
     android:orientation="vertical"
     tools:context=".fragment.MergedFragment">
 
-    <FrameLayout
-        android:orientation="vertical"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        <TextView
+            android:id="@+id/tvTwitterInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
+
+        <TextView
+            android:id="@+id/tvRedditInfo"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="TextView" />
 
         <android.support.v7.widget.RecyclerView
             android:id="@+id/rvMerged"
@@ -19,5 +26,4 @@
 
         </android.support.v7.widget.RecyclerView>
 
-    </FrameLayout>
 </LinearLayout>

@@ -63,7 +63,12 @@ public class RedditFragment extends Fragment {
     }
 
     public void setContent(List<PostTest> content){
+        this.posts = content;
         redditAdapter.setContent(content);
+    }
+
+    public List<PostTest> getRedditList(){
+        return this.redditAdapter.getList();
     }
 
     @Override

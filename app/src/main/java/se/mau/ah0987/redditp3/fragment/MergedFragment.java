@@ -3,26 +3,30 @@ package se.mau.ah0987.redditp3.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 import java.util.List;
 
 import se.mau.ah0987.redditp3.Controller;
 import se.mau.ah0987.redditp3.R;
-import se.mau.ah0987.redditp3.adapter.MergedAdapter;
-import se.mau.ah0987.redditp3.entity.Post;
+import se.mau.ah0987.redditp3.adapter.RedditAdapter;
+import se.mau.ah0987.redditp3.entity.PostTest;
 
 public class MergedFragment extends Fragment {
-    private RecyclerView rvMerged;
-    private MergedAdapter mergedAdapter;
-    private List<Post> content = new ArrayList<>();
+    private RecyclerView recyclerView;
+    private RedditAdapter redditAdapter;
+    private List<PostTest> content = new ArrayList<>();
     private Controller controller;
+    private TextView tvReddit;
+    private TextView tvTwitter;
 
     public MergedFragment() {
         // Required empty public constructor
@@ -32,42 +36,29 @@ public class MergedFragment extends Fragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_merged, container, false);
         Log.d("ONCREATE TWITTER", "MERGED");
-        rvMerged = view.findViewById(R.id.rvMerged);
-        rvMerged.setLayoutManager(new LinearLayoutManager(getActivity()));
-        if (savedInstanceState != null) {
-            content = savedInstanceState.getParcelableArrayList("postList");
-        }
-        mergedAdapter = new MergedAdapter(content);
-        mergedAdapter.setController(controller);
-        rvMerged.setAdapter(mergedAdapter);
+        tvTwitter = view.findViewById(R.id.tvTwitterInfo);
+        tvReddit = view.findViewById(R.id.tvRedditInfo);
+        tvReddit.setText(controller.checkRedditLogin());
+        recyclerView = view.findViewById(R.id.rvMerged);
+        recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        redditAdapter = new RedditAdapter(getActivity(), content);
+        recyclerView.setAdapter(redditAdapter);
         return view;
     }
 
-    @Override
-    public void onResume() {
-        super.onResume();
-        if(mergedAdapter != null)
-            mergedAdapter.setController(controller);
+    public void setContent(List<PostTest> content){
+        this.content = content;
+        redditAdapter.setContent(content);
     }
 
     @Override
     public void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putParcelableArrayList("postList", (ArrayList<Post>) content);
     }
 
-    public void setContent(List<Post> content) {
-        this.content = content;
-    }
-
-    public void setContent(Post post) {
-        this.content.add(0, post);
-        mergedAdapter.notifyDataSetChanged();
-    }
 
     public void setController(Controller controller) {
         this.controller = controller;
-        if(mergedAdapter !=null)
-            mergedAdapter.setController(controller);
     }
 }

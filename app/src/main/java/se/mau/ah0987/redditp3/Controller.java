@@ -26,7 +26,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
+import java.util.function.ToDoubleBiFunction;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -69,7 +71,7 @@ public class Controller {
     private static final String ACCESS_TOKEN_URL =
             "https://www.reddit.com/api/v1/access_token";
 
-    private String accessToken;
+    private String accessToken = null;
     private String refreshToken;
     private List<PostTest> posts = new ArrayList<PostTest>();
 
@@ -103,6 +105,7 @@ public class Controller {
                 switch (item.getItemId()) {
                     case R.id.navigation1_merged:
                         showFragment("MergedFragment");
+                        mergedFragment.setContent(createMergedFeed());
                         return true;
                     case R.id.navigation2_twitter:
                         showFragment("TwitterFragment");
@@ -118,7 +121,9 @@ public class Controller {
     }
 
     private void initializeFragments(Bundle savedInstanceState) {
+
         if(savedInstanceState == null) {
+            Log.v("NULL", "VAFAN");
             mergedFragment = new MergedFragment();
             twitterFragment = new TwitterFragment();
             redditFragment = new RedditFragment();
@@ -130,6 +135,7 @@ public class Controller {
             ft.add(R.id.fragment_container, redditFragment, "RedditFragment");
             ft.commit();
         } else {
+            Log.v("SAVEDSTATE", "VAFAN");
             mergedFragment = (MergedFragment)fragmentManager.findFragmentByTag("MergedFragment");
             twitterFragment = (TwitterFragment)fragmentManager.findFragmentByTag("TwitterFragment");
             redditFragment = (RedditFragment)fragmentManager.findFragmentByTag("RedditFragment");
@@ -165,7 +171,7 @@ public class Controller {
         });
     }
 
-    private void showFragment(String tag) {
+    public void showFragment(String tag) {
         Fragment fragment = fragmentManager.findFragmentByTag(tag);
         Fragment currentFragment = fragmentManager.findFragmentByTag(currentFragmentTag);
         if(fragment != null) {
@@ -208,15 +214,6 @@ public class Controller {
         newDialog.show(ft, tag);
     }
 
-    public void twitterLoginDialog(String username, String password) {
-        mergedFragment.setContent(new Post("tweet test", username, password));
-        //TODO Twitter login
-    }
-
-    public void redditLoginDialog(String username, String password) {
-        mergedFragment.setContent(new Post("reddit test", username, password));
-        //TODO Reddit login
-    }
 
     public void loginReddit(){
         String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
@@ -229,6 +226,30 @@ public class Controller {
     public void loginTwitter(){
         mainActivity.setRedditLogin(false);
         logIn();
+    }
+
+    public List<PostTest> createMergedFeed(){
+        ArrayList<PostTest> reddit = (ArrayList<PostTest>)redditFragment.getRedditList();
+        ArrayList<PostTest> twitter = (ArrayList<PostTest>)twitterFragment.getTwitterList();
+        ArrayList<PostTest> mergedList = new ArrayList<>();
+        Log.d("CREATEMERGED", "redditsize: " + reddit.size());
+
+        mergedList = reddit;
+        return mergedList;
+    }
+
+    public boolean checkTwitterLogin(){
+        //TODO
+
+        return true;
+    }
+
+    public String checkRedditLogin(){
+        if(accessToken==null){
+            return "Log into Reddit to create the merged feed";
+        }else{
+            return "Reddit feed";
+        }
     }
 
     /**
@@ -258,7 +279,6 @@ public class Controller {
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
-                //mainActivity.setRedditLogin(false);
                 String json = response.body().string();
 
                 JSONObject data = null;
@@ -270,7 +290,7 @@ public class Controller {
 
                     Log.d("LOL", "Access Token = " + accessToken);
                     Log.d("LOL", "Refresh Token = " + refreshToken);
-                    test(); //fetch the data RENAME??
+                    getLastestPosts(); //fetch the data
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
@@ -278,45 +298,36 @@ public class Controller {
         });
     }
 
-    public void test(){
+    public void getLastestPosts(){
         OkHttpClient client = new OkHttpClient();
         Request request = new Request.Builder()
-                //.url("https://oauth.reddit.com/subreddits/mine/subscriber?count=0")
-                .url("https://oauth.reddit.com?count=0")
-                //.addHeader("User-Agent", "Sample App")
+                .url("https://oauth.reddit.com/new?count=0")
                 .addHeader("Authorization", "bearer "+ accessToken)
                 .get().build();
-        //.method("GET",null).build();
-        //.url("https://oauth.reddit.com/api/v1/me/karma").build();
         Log.v("accestoken",request.toString());
         client.newCall(request).enqueue(new Callback(){
-
             @Override
             public void onFailure(Call call, IOException e) {
                 Log.v("fel", "fel");
             }
-
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String json = response.body().string();
                 JSONObject data = null;
-
                 Log.d("test1", json);
                 try {
                     data = new JSONObject(json);
-                    JSONObject test = data.getJSONObject("data");
-                    JSONArray test2 = test.getJSONArray("children");
-                    test2.length();
-                    //String test4 = test2.getJSONObject(0).getJSONObject("display_name").toString();
-                    //Log.d("test3", test4);
-                    Log.d("test3", String.valueOf(test2.length()));
-                    for(int i = 0; i < test2.length(); i ++){
-                        //String user = test2.getJSONObject(i).getJSONObject("data").getString("display_name");
-                        String title = test2.getJSONObject(i).getJSONObject("data").getString("title");
-                        String subreddit = test2.getJSONObject(i).getJSONObject("data").getString("subreddit");
-                        String user = test2.getJSONObject(i).getJSONObject("data").getString("author");
-                        String url2 = test2.getJSONObject(i).getJSONObject("data").getString("url");
-                        String date = test2.getJSONObject(i).getJSONObject("data").getString("created");
+                    JSONObject dataObject = data.getJSONObject("data");
+                    JSONArray dataChildrenArray = dataObject.getJSONArray("children");
+                    dataChildrenArray.length();
+                    Log.d("test3", String.valueOf(dataChildrenArray.length()));
+                    for(int i = 0; i < dataChildrenArray.length(); i ++){
+                        JSONObject childrenData = dataChildrenArray.getJSONObject(i).getJSONObject("data");
+                        String title = childrenData.getString("title");
+                        String subreddit = childrenData.getString("subreddit");
+                        String user = childrenData.getString("author");
+                        String url2 = childrenData.getString("url");
+                        String date = childrenData.getString("created");
                         String platform = "Reddit";
                         Log.d("testingURL", url2);
                         Log.d("date", date);
@@ -337,18 +348,14 @@ public class Controller {
                             redditFragment.setContent(posts);
                         }
                     });
-
-                    //this.accessToken = data.optString("access_token");
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-                //String test = response.toString();
-                //String test = response.headers().toString();
-                //Log.v("TEST", json);
-                //Log.v("TEST", json);
             }
         });
     }
+
+
 
     private void logIn() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
@@ -358,12 +365,6 @@ public class Controller {
         }
         else
         {
-            /*FragmentManager fragmentManager = getSupportFragmentManager();
-            TwitterFragment twitterFragment = (TwitterFragment)fragmentManager.findFragmentById(R.id.fragment);
-            FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-            fragmentTransaction.commit();
-            *//*Intent intent = new Intent(this, TwitterFragment.class);
-            startActivity(intent);*/
         }
     }
 

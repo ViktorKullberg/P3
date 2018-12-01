@@ -30,12 +30,11 @@ public class MainActivity extends AppCompatActivity {
         redditlogin = loginState;
     }
 
-
     @Override
     public void onResume() {
         super.onResume();
         Log.d("TESTING", "HELLO" + redditlogin);
-        if(redditlogin && getIntent()!=null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
+        if(redditlogin && getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
             Log.d("TESTING", "YES");
             Uri uri = getIntent().getData();
             if(uri.getQueryParameter("error") != null) {
@@ -55,8 +54,12 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putBoolean("redditlogin", redditlogin);
         Log.d("OnsavedState", "test " + redditlogin);
         controller.onSaveInstanceState(outState);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }

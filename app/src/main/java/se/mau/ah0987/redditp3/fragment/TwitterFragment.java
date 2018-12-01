@@ -296,6 +296,10 @@ public class TwitterFragment extends Fragment {
         }
     }
 
+    public List<PostTest> getTwitterList(){
+        return this.list;
+    }
+
     public void setController(Controller controller) {
         this.controller = controller;
     }
