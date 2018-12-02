@@ -42,7 +42,7 @@ public class MainActivity extends AppCompatActivity {
                 Log.e("LOL", "An error has occurred : " + error);
             } else {
                 String state = uri.getQueryParameter("state");
-                if(state.equals(STATE)) {
+                if (state != null && state.equals(STATE)) {
                     String code = uri.getQueryParameter("code");
                     controller.getAccessToken(code);
                 }

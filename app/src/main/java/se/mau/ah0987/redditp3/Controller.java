@@ -64,7 +64,7 @@ public class Controller {
 
     private static final String CLIENT_ID = "7_UNbRy-oSBuog";
 
-    private static final String REDIRECT_URI = "http://www.example.com/my_redirect";
+    private static final String REDIRECT_URI = "myapp://auth";
 
     private static final String STATE = "MY_RANDOM_STRING_123456";
 

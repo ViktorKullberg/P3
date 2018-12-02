@@ -1,5 +1,6 @@
 package se.mau.ah0987.redditp3;
 
+
 import twitter4j.Twitter;
 import twitter4j.TwitterException;
 import twitter4j.TwitterFactory;
