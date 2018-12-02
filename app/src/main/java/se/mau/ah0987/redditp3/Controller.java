@@ -351,6 +351,7 @@ public class Controller {
                         @Override
                         public void run() {
                             redditFragment.setContent(posts);
+                            redditFragment.setSwipeContainer(false);
                         }
                     });
                 } catch (JSONException e) {

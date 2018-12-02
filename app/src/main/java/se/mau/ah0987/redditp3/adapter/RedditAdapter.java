@@ -90,7 +90,12 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         holder.tvContent.setText(content.get(position).getContent());
         holder.tvSubreddit.setText(content.get(position).getSubreddit());
         holder.tvUser.setText(content.get(position).getUser());
-        holder.tvPlatform.setText(content.get(position).getPlatform());
+        if(content.get(position).getPlatform().equals("Reddit")) {
+            holder.ivPlatform.setImageResource(R.drawable.ic_reddit_filled_black_24dp);
+        } else {
+            holder.ivPlatform.setImageResource(R.drawable.ic_twitter_filled_black_24dp);
+        }
+        //holder.tvPlatform.setText(content.get(position).getPlatform());
         holder.tvTitle.setText(content.get(position).getTitle());
         holder.tvDate.setText(String.valueOf(content.get(position).getDateFormatted()));
         holder.url = null;
@@ -144,6 +149,7 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         private TextView tvPlatform;
         private TextView tvDate;
         private ImageView imageView;
+        private ImageView ivPlatform;
         private VideoView videoView;
         private MediaController mc;
         private String url= null;
@@ -161,8 +167,9 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             tvUser = itemView.findViewById(R.id.tvUser);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            tvPlatform = itemView.findViewById(R.id.tvPlatform);
+            //tvPlatform = itemView.findViewById(R.id.tvPlatform);
             imageView = itemView.findViewById(R.id.imageTest);
+            ivPlatform = itemView.findViewById(R.id.ivPlatform);
         }
 
         public void startAnimation(){

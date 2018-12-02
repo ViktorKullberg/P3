@@ -9,6 +9,7 @@ import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
@@ -40,6 +41,7 @@ import java.util.Locale;
 import se.mau.ah0987.redditp3.ConstantValues;
 import se.mau.ah0987.redditp3.Controller;
 import se.mau.ah0987.redditp3.MainActivity;
+import se.mau.ah0987.redditp3.MyItemDecoration;
 import se.mau.ah0987.redditp3.R;
 import se.mau.ah0987.redditp3.TwitterUtil;
 import se.mau.ah0987.redditp3.adapter.RedditAdapter;
@@ -64,6 +66,7 @@ public class TwitterFragment extends Fragment {
     private RecyclerView recyclerView;
     private RedditAdapter redditAdapter;
     private List<PostTest> list = new ArrayList<>();
+    private SwipeRefreshLayout swipeContainer;
 
 
     public TwitterFragment() {
@@ -104,10 +107,29 @@ public class TwitterFragment extends Fragment {
         textViewUserName = view.findViewById(R.id.textViewUserName);
         recyclerView = view.findViewById(R.id.rvTwitter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+        recyclerView.addItemDecoration(new MyItemDecoration(getContext()));
         redditAdapter = new RedditAdapter(getActivity(), list);
         recyclerView.setAdapter(redditAdapter);
         buttonUpdateStatus.setOnClickListener(buttonUpdateStatusOnClickListener);
         buttonLogout.setOnClickListener(buttonLogoutOnClickListener);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                getTweets();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
     }
 
     public void setRvContent(List<PostTest> list) {
@@ -220,7 +242,7 @@ public class TwitterFragment extends Fragment {
 
         @Override
         protected void onPostExecute(Boolean result) {
-
+            swipeContainer.setRefreshing(false);
         }
 
         @Override

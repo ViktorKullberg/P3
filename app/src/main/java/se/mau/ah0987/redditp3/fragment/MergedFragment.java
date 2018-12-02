@@ -16,6 +16,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.mau.ah0987.redditp3.Controller;
+import se.mau.ah0987.redditp3.MyItemDecoration;
 import se.mau.ah0987.redditp3.R;
 import se.mau.ah0987.redditp3.adapter.RedditAdapter;
 import se.mau.ah0987.redditp3.entity.PostTest;
@@ -44,7 +45,7 @@ public class MergedFragment extends Fragment {
         tvReddit.setText(controller.checkRedditLogin());
         recyclerView = view.findViewById(R.id.rvMerged);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        recyclerView.addItemDecoration(new DividerItemDecoration(getActivity(), DividerItemDecoration.VERTICAL));
+        recyclerView.addItemDecoration(new MyItemDecoration(getContext()));
         redditAdapter = new RedditAdapter(getActivity(), content);
         recyclerView.setAdapter(redditAdapter);
         return view;
