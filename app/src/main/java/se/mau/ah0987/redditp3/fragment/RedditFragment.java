@@ -24,7 +24,9 @@ import se.mau.ah0987.redditp3.adapter.RedditAdapter;
 import se.mau.ah0987.redditp3.entity.Post;
 import se.mau.ah0987.redditp3.entity.PostTest;
 
-
+/**
+ * Fragment to display the reddit feed
+ */
 public class RedditFragment extends Fragment {
     private OnOptionsItemSelectedListener listener;
     private Controller controller;
@@ -40,7 +42,6 @@ public class RedditFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("ONCREATE REDDIT", "CREATED");
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_reddit, container, false);
         logInReddit = view.findViewById(R.id.btnLoginReddit);

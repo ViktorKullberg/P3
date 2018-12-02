@@ -1,5 +1,8 @@
 package se.mau.ah0987.redditp3;
 
+/**
+ * Constants for the twitter login
+ */
 public class ConstantValues {
     public static String TWITTER_CONSUMER_KEY = "OVnzL0tWgXRcVcz7SYlZyLnez";
     public static String TWITTER_CONSUMER_SECRET = "zIlkrK3CUKgKuLS8DOyORwNr2P7NoUliBI4fYiZMFQP4bz9rYx";

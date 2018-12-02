@@ -7,6 +7,11 @@ import java.util.Calendar;
 
 import se.mau.ah0987.redditp3.DateConverter;
 
+/**
+ * Post Item used to display a tweet or reddit post
+ * Contains information about content, user, date, title etc..
+ * Authors:
+ */
 public class PostTest {
     private String content;
     private String subreddit;
@@ -60,6 +65,11 @@ public class PostTest {
         return date;
     }
 
+    /**
+     * Returns the date as a long.
+     * Since reddit and twitter uses differens time formats
+     * for posts we have to parse and convert
+     */
     public long getDate(){
         if(platform.equals("Twitter")){
             return (new Long(date).longValue()/1000)+3600*8;
@@ -68,7 +78,8 @@ public class PostTest {
     }
 
     /**
-     *
+     * Format the time to displat how long ago it was. Due to time difference
+     * we have to append 3600*8 for posts.
      */
     public String getDateFormatted(){
         Calendar rightNow = Calendar.getInstance();
@@ -86,15 +97,12 @@ public class PostTest {
         }
         return returnTime;
     }
+
     public boolean isGif(){
         if(url.endsWith("gif")){
             return true;
         }
         return false;
-    }
-
-    public void setSubreddit(String subreddit) {
-        this.subreddit = subreddit;
     }
 
     public String getUser() {

@@ -9,7 +9,10 @@ import twitter4j.auth.RequestToken;
 import twitter4j.conf.Configuration;
 import twitter4j.conf.ConfigurationBuilder;
 
-
+/**
+ * Twitter Utility class
+ * Author
+ */
 public final class TwitterUtil {
 
     private RequestToken requestToken = null;

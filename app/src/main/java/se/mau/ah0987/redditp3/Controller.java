@@ -46,6 +46,10 @@ import se.mau.ah0987.redditp3.fragment.RedditFragment;
 import se.mau.ah0987.redditp3.fragment.TwitterFragment;
 import twitter4j.auth.RequestToken;
 
+/**
+ * Controller class which controlls the flow of the app.
+ * Authors:
+ */
 public class Controller {
     private MainActivity mainActivity;
     private BottomNavigationView bottomNavigation;
@@ -123,19 +127,16 @@ public class Controller {
     private void initializeFragments(Bundle savedInstanceState) {
 
         if(savedInstanceState == null) {
-            Log.v("NULL", "VAFAN");
             mergedFragment = new MergedFragment();
             twitterFragment = new TwitterFragment();
             redditFragment = new RedditFragment();
             currentFragmentTag = "MergedFragment";
-
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.add(R.id.fragment_container, mergedFragment, "MergedFragment");
             ft.add(R.id.fragment_container, twitterFragment, "TwitterFragment");
             ft.add(R.id.fragment_container, redditFragment, "RedditFragment");
             ft.commit();
         } else {
-            Log.v("SAVEDSTATE", "VAFAN");
             mergedFragment = (MergedFragment)fragmentManager.findFragmentByTag("MergedFragment");
             twitterFragment = (TwitterFragment)fragmentManager.findFragmentByTag("TwitterFragment");
             redditFragment = (RedditFragment)fragmentManager.findFragmentByTag("RedditFragment");
@@ -150,7 +151,6 @@ public class Controller {
             public boolean onOptionsItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.login :
-                        //showDialog(twitterLoginDialog, "TwitterLoginDialog");
                         loginTwitter();
                         return true;
                 }
@@ -162,7 +162,6 @@ public class Controller {
             public boolean onOptionsItemSelected(MenuItem item) {
                 switch (item.getItemId()) {
                     case R.id.login :
-                        //showDialog(redditLoginDialog, "RedditLoginDialog");
                         loginReddit();
                         return true;
                 }
@@ -214,15 +213,19 @@ public class Controller {
         newDialog.show(ft, tag);
     }
 
-
+    /**
+     * Start login to reddit using OAUTH 2.0
+     */
     public void loginReddit(){
         String url = String.format(AUTH_URL, CLIENT_ID, STATE, REDIRECT_URI);
-        Log.v("LOL", url);
         mainActivity.setRedditLogin(true);
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(url));
         mainActivity.startActivity(intent);
     }
 
+    /**
+     * Start login twitter using OAUTH 2.0
+     */
     public void loginTwitter(){
         mainActivity.setRedditLogin(false);
         logIn();
@@ -234,15 +237,22 @@ public class Controller {
         ArrayList<PostTest> mergedList = new ArrayList<>();
         Log.d("CREATEMERGED", "redditsize: " + reddit.size());
 
-        mergedList = reddit;
+        for(int i = 0; i < reddit.size(); i++){
+           // mergedList.add(reddit.get(i));
+            mergedList.add(i, reddit.get(i));
+        }
+
+        for(int i = 0; i < twitter.size(); i ++) {
+            int j = 0;
+            while (j < mergedList.size() && twitter.get(i).getDate() < mergedList.get(j).getDate()) {
+                j++;
+            }
+            mergedList.add(j, twitter.get(i));
+        }
+
         return mergedList;
     }
 
-    public boolean checkTwitterLogin(){
-        //TODO
-
-        return true;
-    }
 
     public String checkRedditLogin(){
         if(accessToken==null){
@@ -254,7 +264,6 @@ public class Controller {
 
     /**
      * Initiats the http request to Reddit form the accestokens
-     * @param code
      */
     public void getAccessToken(String code) {
         OkHttpClient client = new OkHttpClient();
@@ -269,27 +278,24 @@ public class Controller {
                         "grant_type=authorization_code&code=" + code +
                                 "&redirect_uri=" + REDIRECT_URI))
                 .build();
-        Log.v("accestoken",request.toString());
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                //mainActivity.setRedditLogin(false);
-                Log.e("LOL", "ERROR: " + e);
+                Log.e("Failed HTTrequest", "ERROR: " + e);
             }
 
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 String json = response.body().string();
-
                 JSONObject data = null;
                 try {
                     data = new JSONObject(json);
                     accessToken = data.optString("access_token");
+
                     //this.accessToken = data.optString("access_token");
                     refreshToken = data.optString("refresh_token");
-
-                    Log.d("LOL", "Access Token = " + accessToken);
-                    Log.d("LOL", "Refresh Token = " + refreshToken);
+                    Log.d("Access token", "Access Token = " + accessToken);
+                    Log.d("Refresh token", "Refresh Token = " + refreshToken);
                     getLastestPosts(); //fetch the data
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -300,7 +306,7 @@ public class Controller {
 
     public void getLastestPosts(){
         OkHttpClient client = new OkHttpClient();
-        Request request = new Request.Builder()
+        Request request = new Request.Builder() //builds the request with acceesstoken
                 .url("https://oauth.reddit.com/new?count=0")
                 .addHeader("Authorization", "bearer "+ accessToken)
                 .get().build();
@@ -308,7 +314,7 @@ public class Controller {
         client.newCall(request).enqueue(new Callback(){
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.v("fel", "fel");
+                Log.v("Failure", "Error" + e.toString());
             }
             @Override
             public void onResponse(Call call, Response response) throws IOException {
@@ -332,7 +338,7 @@ public class Controller {
                         Log.d("testingURL", url2);
                         Log.d("date", date);
                         Bitmap image = null;
-                        if(url2.contains(".png")|| url2.contains(".jpg")) { //NOT VERY GUD CODE GÖR MED ASYNC TASK
+                        if(url2.contains(".png")|| url2.contains(".jpg")) {
                             URL url = new URL(url2);
                             InputStream stream = url.openConnection().getInputStream();
                             image = BitmapFactory.decodeStream(stream);
@@ -344,7 +350,6 @@ public class Controller {
                     mainActivity.runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
-                            Log.d("test", String.valueOf(posts.size()));
                             redditFragment.setContent(posts);
                         }
                     });
@@ -356,7 +361,9 @@ public class Controller {
     }
 
 
-
+    /**
+     * Twitter login, if we have a accestoken we will use that
+     */
     private void logIn() {
         SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity);
         if (!sharedPreferences.getBoolean(ConstantValues.PREFERENCE_TWITTER_IS_LOGGED_IN,false))

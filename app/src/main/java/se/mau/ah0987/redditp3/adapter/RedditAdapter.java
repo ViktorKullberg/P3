@@ -6,7 +6,6 @@ import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
@@ -25,7 +24,11 @@ import se.mau.ah0987.redditp3.R;
 import se.mau.ah0987.redditp3.entity.Post;
 import se.mau.ah0987.redditp3.entity.PostTest;
 
-
+/**
+ * Adapter for all our recyclerviews.
+ * Enables the feed to diaplays gifs, videos and show images.
+ * Authors:
+ */
 public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
     private List<PostTest> content = new ArrayList<PostTest>();
     private LayoutInflater inflater;
@@ -43,8 +46,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
 
     public void setContent(List<PostTest> content){
         this.content = content;
-        //this.content.addAll(content);
-        Log.d("CONTENT", String.valueOf(content.size()));
         super.notifyDataSetChanged();
     }
 
@@ -67,12 +68,10 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
 
     @Override
     public void onViewDetachedFromWindow(@NonNull Holder holder) {
-
-        Log.d("DETACHED",holder.tvContent.getText().toString());
-        holder.videoView.stopPlayback();
+        holder.videoView.stopPlayback(); //stop animation on detach
         holder.videoView.clearAnimation();
         holder.videoView.suspend();
-        holder.videoView.setVideoURI(null);
+        holder.videoView.setVideoURI(null); //had problems with leaking data between recycleritems
         super.onViewDetachedFromWindow(holder);
         //holder.videoView.suspend();
         //holder.videoView.setVideoURI(null);
@@ -80,10 +79,8 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
 
     @Override
     public void onViewAttachedToWindow(@NonNull Holder holder) {
-        //super.onViewAttachedToWindow(holder);
-        Log.d("ATTACHED TO VIEW",holder.tvContent.getText().toString() + holder.url);
-        if(holder.url!=null && holder.url.endsWith("mp4")){
-            holder.startAnimation();
+        if(holder.url!=null && holder.url.endsWith("mp4")){ //we have a video
+            holder.startAnimation();  //start it
         }
         super.onViewAttachedToWindow(holder);
     }
@@ -97,8 +94,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         holder.tvTitle.setText(content.get(position).getTitle());
         holder.tvDate.setText(String.valueOf(content.get(position).getDateFormatted()));
         holder.url = null;
-        Log.d("CONTENTURL",content.get(position).getUrl());
-
         if(content.get(position).isImage()){
             holder.imageView.setVisibility(View.VISIBLE);
             holder.imageView.setImageBitmap(content.get(position).getBitmap());
@@ -114,8 +109,7 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             holder.videoView.setVideoURI(null);
             holder.videoView.suspend();
             holder.videoView.setVisibility(View.GONE);
-        }else if(content.get(position).getUrl().endsWith("gifv")) { //"video"
-            //content.get(position).getBitmap().recycle();
+        }else if(content.get(position).getUrl().endsWith("gifv")) { //"video" imgur has this ending on gifs
             holder.imageView.setImageBitmap(null);
             holder.imageView.setVisibility(View.GONE);
             holder.videoView.setVisibility(View.VISIBLE);
@@ -126,7 +120,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             holder.imageView.setImageBitmap(null);
             holder.imageView.setVisibility(View.GONE);
             holder.videoView.setVisibility(View.VISIBLE);
-            String oldUrl = content.get(position).getUrl();
             holder.url = content.get(position).getUrl();
         }
         else{
@@ -135,31 +128,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             holder.videoView.setVideoURI(null);
             holder.videoView.setVisibility(View.GONE);
         }
-
-
-
-        /*if(content.get(position).getUrl()!=null){
-            if(content.get(position).getUrl().contains("gifv")) {
-                holder.videoView.setVisibility(View.VISIBLE);
-                String oldUrl = content.get(position).getUrl();
-                //oldUrl.replace("gifv", "mp4");
-                String newUrl = oldUrl.replace("gifv", "mp4");
-                holder.url = newUrl;
-                Log.d("URLTEST", newUrl);
-                holder.imageView.setVisibility(View.GONE);
-                //notifyDataSetChanged();
-            }else if (content.get(position).getUrl().contains("gif")) {
-                Ion.with(holder.imageView)
-                        .animateGif(AnimateGifMode.ANIMATE)
-                        .load(content.get(position).getUrl());
-                holder.videoView.setVisibility(View.GONE);
-            }else{
-                holder.imageView.setImageBitmap(content.get(position).getBitmap());
-                holder.videoView.setVisibility(View.GONE);
-            }
-        }*/
-
-        //holder.imageView.setImageBitmap(content.get(position).getBitmap());
     }
 
     @Override
@@ -187,7 +155,7 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             this.videoView.setMediaController(this.mc);
             mc.setVisibility(View.INVISIBLE);
             videoView.setVideoURI(null);
-            videoView.setOnClickListener(new Test());
+            videoView.setOnClickListener(new TouchListener()); //play on touch
             tvContent = itemView.findViewById(R.id.tvContent);
             tvSubreddit = itemView.findViewById(R.id.tvSubreddit);
             tvUser = itemView.findViewById(R.id.tvUser);
@@ -203,22 +171,14 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
                 this.videoView.setVideoURI(video);
                 this.mc.setMediaPlayer(this.videoView);
                 this.mc.setAnchorView(this.videoView);
-                //this.mc.setMediaPlayer(this.videoView);
             }
         }
-
-        public void loadUrl(String url){
-            //webview.loadUrl(url);
-            //webview.clearCache(true);
-            //webview.clearHistory();
-        }
-
         @Override
         public void onClick(View v) {
             //videoView.start();
         }
 
-        public class Test implements View.OnClickListener{
+        public class TouchListener implements View.OnClickListener{
             @Override
             public void onClick(View v) {
                 if(videoView.isPlaying()){

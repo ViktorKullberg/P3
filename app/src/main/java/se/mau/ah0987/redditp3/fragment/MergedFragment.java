@@ -20,6 +20,10 @@ import se.mau.ah0987.redditp3.R;
 import se.mau.ah0987.redditp3.adapter.RedditAdapter;
 import se.mau.ah0987.redditp3.entity.PostTest;
 
+
+/**
+ * Fragment to display the merged feed
+ */
 public class MergedFragment extends Fragment {
     private RecyclerView recyclerView;
     private RedditAdapter redditAdapter;
@@ -35,7 +39,6 @@ public class MergedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_merged, container, false);
-        Log.d("ONCREATE TWITTER", "MERGED");
         tvTwitter = view.findViewById(R.id.tvTwitterInfo);
         tvReddit = view.findViewById(R.id.tvRedditInfo);
         tvReddit.setText(controller.checkRedditLogin());

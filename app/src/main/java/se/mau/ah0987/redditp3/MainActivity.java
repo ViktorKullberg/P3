@@ -8,7 +8,10 @@ import android.os.Bundle;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 
-
+/**
+ * MainActivity, initiates the app and creates the controller which handles all the fragments
+ * Authors:
+ */
 public class MainActivity extends AppCompatActivity {
     private Controller controller;
     private Toolbar actionToolbar;
@@ -19,7 +22,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        Log.d("ONCREATE", "ACTIVITY" + redditlogin);
         setContentView(R.layout.activity_main);
         actionToolbar = (Toolbar)findViewById(R.id.toolbar);
         setSupportActionBar(actionToolbar);
@@ -33,10 +35,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public void onResume() {
         super.onResume();
-        Log.d("TESTING", "HELLO" + redditlogin);
         if(redditlogin && getIntent()!=null && getIntent().getAction()!=null && getIntent().getAction().equals(Intent.ACTION_VIEW)) {
-            Log.d("TESTING", "YES");
-            Uri uri = getIntent().getData();
+            Uri uri = getIntent().getData(); //ONLY reddit login will get here
             if(uri.getQueryParameter("error") != null) {
                 String error = uri.getQueryParameter("error");
                 Log.e("LOL", "An error has occurred : " + error);
@@ -54,7 +54,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        Log.d("OnsavedState", "test " + redditlogin);
         controller.onSaveInstanceState(outState);
     }
 

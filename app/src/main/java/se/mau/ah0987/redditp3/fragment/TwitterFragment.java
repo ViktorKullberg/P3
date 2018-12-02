@@ -52,7 +52,9 @@ import twitter4j.User;
 import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
-
+/**
+ * Fragment to display the twitter feed
+ */
 public class TwitterFragment extends Fragment {
     private OnOptionsItemSelectedListener listener;
     private Controller controller;
@@ -71,8 +73,6 @@ public class TwitterFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        Log.d("ONCREATE TWITTER", "CREATED");
-        // Inflate the layout for this fragment
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_twitter, container, false);
         initializeComponent(view);
@@ -97,12 +97,12 @@ public class TwitterFragment extends Fragment {
     }
 
     private void initializeComponent(View view) {
-        buttonUpdateStatus = (Button) view.findViewById(R.id.buttonUpdateStatus);
-        buttonLogout = (Button) view.findViewById(R.id.buttonLogout);
-        editTextStatus = (EditText) view.findViewById(R.id.editTextStatus);
-        textViewStatus = (TextView) view.findViewById(R.id.textViewStatus);
-        textViewUserName = (TextView) view.findViewById(R.id.textViewUserName);
-        recyclerView = (RecyclerView) view.findViewById(R.id.rvTwitter);
+        buttonUpdateStatus = view.findViewById(R.id.buttonUpdateStatus);
+        buttonLogout = view.findViewById(R.id.buttonLogout);
+        editTextStatus =  view.findViewById(R.id.editTextStatus);
+        textViewStatus = view.findViewById(R.id.textViewStatus);
+        textViewUserName = view.findViewById(R.id.textViewUserName);
+        recyclerView = view.findViewById(R.id.rvTwitter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         redditAdapter = new RedditAdapter(getActivity(), list);
         recyclerView.setAdapter(redditAdapter);
@@ -231,7 +231,7 @@ public class TwitterFragment extends Fragment {
                 String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, "");
                 String accessTokenSecret = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET, "");
                 // gets Twitter instance with default credentials
-
+                list.clear();
                 if (!StringUtil.isNullOrWhitespace(accessTokenString) && !StringUtil.isNullOrWhitespace(accessTokenSecret)) {
                     AccessToken accessToken = new AccessToken(accessTokenString, accessTokenSecret);
                     List<twitter4j.Status> statuses = TwitterUtil.getInstance().getTwitterFactory().getInstance(accessToken).getHomeTimeline();
