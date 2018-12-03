@@ -2,10 +2,7 @@ package se.mau.ah0987.redditp3.fragment;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v4.app.Fragment;
@@ -13,7 +10,6 @@ import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.text.Html;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -27,16 +23,8 @@ import android.widget.Toast;
 
 import com.hintdesk.core.util.StringUtil;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
-import java.util.Locale;
 
 import se.mau.ah0987.redditp3.ConstantValues;
 import se.mau.ah0987.redditp3.Controller;
@@ -46,13 +34,6 @@ import se.mau.ah0987.redditp3.R;
 import se.mau.ah0987.redditp3.TwitterUtil;
 import se.mau.ah0987.redditp3.adapter.RedditAdapter;
 import se.mau.ah0987.redditp3.entity.PostTest;
-import twitter4j.MediaEntity;
-import twitter4j.Status;
-import twitter4j.Twitter;
-import twitter4j.TwitterException;
-import twitter4j.User;
-import twitter4j.auth.AccessToken;
-import twitter4j.auth.RequestToken;
 
 /**
  * Fragment to display the twitter feed

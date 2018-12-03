@@ -1,7 +1,6 @@
 package se.mau.ah0987.redditp3.entity;
 
 import android.graphics.Bitmap;
-import android.util.Log;
 
 import java.util.Calendar;
 

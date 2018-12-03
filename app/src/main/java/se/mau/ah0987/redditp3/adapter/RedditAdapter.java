@@ -4,7 +4,6 @@ import android.content.Context;
 import android.net.Uri;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
@@ -21,7 +20,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import se.mau.ah0987.redditp3.R;
-import se.mau.ah0987.redditp3.entity.Post;
 import se.mau.ah0987.redditp3.entity.PostTest;
 
 /**

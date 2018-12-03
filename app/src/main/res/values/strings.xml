@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Merged Feed</string>
+    <string name="app_name">Twiddit</string>
     <string name="title_nav1_map">Twitter</string>
     <string name="title_nav2_group">Merged Feed</string>
     <string name="title_nav3_chat">Reddit</string>
