@@ -238,7 +238,6 @@ public class Controller {
         Log.d("CREATEMERGED", "redditsize: " + reddit.size());
 
         for(int i = 0; i < reddit.size(); i++){
-           // mergedList.add(reddit.get(i));
             mergedList.add(i, reddit.get(i));
         }
 
@@ -281,7 +280,7 @@ public class Controller {
         client.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Log.e("Failed HTTrequest", "ERROR: " + e);
+                Log.e("Failed HTTPrequest", "ERROR: " + e);
             }
 
             @Override
@@ -291,11 +290,7 @@ public class Controller {
                 try {
                     data = new JSONObject(json);
                     accessToken = data.optString("access_token");
-
-                    //this.accessToken = data.optString("access_token");
                     refreshToken = data.optString("refresh_token");
-                    Log.d("Access token", "Access Token = " + accessToken);
-                    Log.d("Refresh token", "Refresh Token = " + refreshToken);
                     getLastestPosts(); //fetch the data
                 } catch (JSONException e) {
                     e.printStackTrace();
@@ -320,13 +315,12 @@ public class Controller {
             public void onResponse(Call call, Response response) throws IOException {
                 String json = response.body().string();
                 JSONObject data = null;
-                Log.d("test1", json);
                 try {
+                    posts.clear();
                     data = new JSONObject(json);
                     JSONObject dataObject = data.getJSONObject("data");
                     JSONArray dataChildrenArray = dataObject.getJSONArray("children");
                     dataChildrenArray.length();
-                    Log.d("test3", String.valueOf(dataChildrenArray.length()));
                     for(int i = 0; i < dataChildrenArray.length(); i ++){
                         JSONObject childrenData = dataChildrenArray.getJSONObject(i).getJSONObject("data");
                         String title = childrenData.getString("title");
@@ -335,8 +329,6 @@ public class Controller {
                         String url2 = childrenData.getString("url");
                         String date = childrenData.getString("created");
                         String platform = "Reddit";
-                        Log.d("testingURL", url2);
-                        Log.d("date", date);
                         Bitmap image = null;
                         if(url2.contains(".png")|| url2.contains(".jpg")) {
                             URL url = new URL(url2);

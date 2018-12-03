@@ -73,8 +73,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         holder.videoView.suspend();
         holder.videoView.setVideoURI(null); //had problems with leaking data between recycleritems
         super.onViewDetachedFromWindow(holder);
-        //holder.videoView.suspend();
-        //holder.videoView.setVideoURI(null);
     }
 
     @Override
@@ -106,7 +104,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             holder.videoView.suspend();
             holder.videoView.setVisibility(View.GONE);
         }else if(content.get(position).isGif()){
-            //content.get(position).getBitmap().recycle();
             holder.imageView.setVisibility(View.VISIBLE);
             Ion.with(holder.imageView)
                     .animateGif(AnimateGifMode.ANIMATE)
@@ -167,7 +164,6 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
             tvUser = itemView.findViewById(R.id.tvUser);
             tvDate = itemView.findViewById(R.id.tvDate);
             tvTitle = itemView.findViewById(R.id.tvTitle);
-            //tvPlatform = itemView.findViewById(R.id.tvPlatform);
             imageView = itemView.findViewById(R.id.imageTest);
             ivPlatform = itemView.findViewById(R.id.ivPlatform);
         }

@@ -39,7 +39,7 @@ public class MainActivity extends AppCompatActivity {
             Uri uri = getIntent().getData(); //ONLY reddit login will get here
             if(uri.getQueryParameter("error") != null) {
                 String error = uri.getQueryParameter("error");
-                Log.e("LOL", "An error has occurred : " + error);
+                Log.e("Error", "An error has occurred : " + error);
             } else {
                 String state = uri.getQueryParameter("state");
                 if (state != null && state.equals(STATE)) {

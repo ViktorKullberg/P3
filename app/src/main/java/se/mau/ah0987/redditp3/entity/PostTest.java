@@ -32,7 +32,6 @@ public class PostTest {
         this.url = url;
         this.date = date;
         this.platform = platform;
-        Log.d("CreatedPost", content+subreddit+user);
     }
 
     public String getContent() {
@@ -85,8 +84,6 @@ public class PostTest {
         Calendar rightNow = Calendar.getInstance();
         long currentTime = rightNow.getTimeInMillis();
         long currentTimeSeconds = currentTime/1000;
-        Log.d("currentMillis", String.valueOf(currentTimeSeconds));
-        Log.d("postTime", String.valueOf(getDate()));
         long timeSincePosted = currentTimeSeconds - getDate();
         timeSincePosted+=3600*8;
         String returnTime = "";
