@@ -123,7 +123,9 @@ public class Controller {
                         return true;
                     case R.id.navigation2_twitter:
                         showFragment("TwitterFragment");
-                        twitterFragment.getTweets();
+                        if(twitterFragment.getTwitterList().isEmpty()) {
+                            twitterFragment.getTweets();
+                        }
                         return true;
                     case R.id.navigation3_reddit:
                         showFragment("RedditFragment");
@@ -372,9 +374,6 @@ public class Controller {
         if (!sharedPreferences.getBoolean(ConstantValues.PREFERENCE_TWITTER_IS_LOGGED_IN,false))
         {
             new TwitterAuthenticateTask().execute();
-        }
-        else
-        {
         }
     }
 
