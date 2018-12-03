@@ -14,9 +14,13 @@ import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
+import android.text.Html;
 import android.util.Base64;
 import android.util.Log;
 import android.view.MenuItem;
+import android.widget.Toast;
+
+import com.hintdesk.core.util.StringUtil;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -24,10 +28,15 @@ import org.json.JSONObject;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.MalformedURLException;
 import java.net.URL;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 import java.util.function.ToDoubleBiFunction;
 
 import okhttp3.Call;
@@ -44,6 +53,11 @@ import se.mau.ah0987.redditp3.entity.PostTest;
 import se.mau.ah0987.redditp3.fragment.MergedFragment;
 import se.mau.ah0987.redditp3.fragment.RedditFragment;
 import se.mau.ah0987.redditp3.fragment.TwitterFragment;
+import twitter4j.MediaEntity;
+import twitter4j.Twitter;
+import twitter4j.TwitterException;
+import twitter4j.User;
+import twitter4j.auth.AccessToken;
 import twitter4j.auth.RequestToken;
 
 /**
@@ -394,6 +408,186 @@ public class Controller {
         @Override
         protected RequestToken doInBackground(String... params) {
             return TwitterUtil.getInstance().getRequestToken();
+        }
+    }
+
+    private static Date getTwitterDate(String date) throws ParseException {
+
+        final String TWITTER="EEE MMM dd HH:mm:ss ZZZZZ yyyy";
+        SimpleDateFormat sf = new SimpleDateFormat(TWITTER, Locale.ENGLISH);
+        sf.setLenient(true);
+        return sf.parse(date);
+    }
+
+    private void setRvContent(List<PostTest> list) {
+        twitterFragment.setContent(list);
+    }
+
+    public void twitterAccessToken(String string) {
+        new TwitterGetAccessTokenTask().execute(string);
+    }
+
+    public void twitterUpdateStatus(String status) {
+        new TwitterUpdateStatusTask().execute(status);
+    }
+
+    public void twitterHomeTimeline() {
+        new TwitterHomeTimelineTask().execute();
+    }
+
+    class TwitterGetAccessTokenTask extends AsyncTask<String, String, String> {
+
+        @Override
+        protected void onPostExecute(String userName) {
+            twitterFragment.setTextViewUserName(userName);
+        }
+
+        @Override
+        protected String doInBackground(String... params) {
+
+            Twitter twitter = TwitterUtil.getInstance().getTwitter();
+            RequestToken requestToken = TwitterUtil.getInstance().getRequestToken();
+            if (!StringUtil.isNullOrWhitespace(params[0])) {
+                try {
+                    AccessToken accessToken = twitter.getOAuthAccessToken(requestToken, params[0]);
+                    SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, accessToken.getToken());
+                    editor.putString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET, accessToken.getTokenSecret());
+                    editor.putBoolean(ConstantValues.PREFERENCE_TWITTER_IS_LOGGED_IN, true);
+                    editor.commit();
+                    return twitter.showUser(accessToken.getUserId()).getName();
+                } catch (TwitterException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            } else {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+                String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, "");
+                String accessTokenSecret = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET, "");
+                AccessToken accessToken = new AccessToken(accessTokenString, accessTokenSecret);
+                try {
+                    TwitterUtil.getInstance().setTwitterFactory(accessToken);
+                    return TwitterUtil.getInstance().getTwitter().showUser(accessToken.getUserId()).getName();
+                } catch (TwitterException e) {
+                    e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+                }
+            }
+
+            return null;  //To change body of implemented methods use File | Settings | File Templates.
+        }
+    }
+
+    class TwitterUpdateStatusTask extends AsyncTask<String, String, Boolean> {
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            if (result)
+                Toast.makeText(mainActivity.getApplicationContext(), "Tweet successfully", Toast.LENGTH_SHORT).show();
+            else
+                Toast.makeText(mainActivity.getApplicationContext(), "Tweet failed", Toast.LENGTH_SHORT).show();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+            try {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+                String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, "");
+                String accessTokenSecret = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET, "");
+
+                if (!StringUtil.isNullOrWhitespace(accessTokenString) && !StringUtil.isNullOrWhitespace(accessTokenSecret)) {
+                    AccessToken accessToken = new AccessToken(accessTokenString, accessTokenSecret);
+                    twitter4j.Status status = TwitterUtil.getInstance().getTwitterFactory().getInstance(accessToken).updateStatus(params[0]);
+                    return true;
+                }
+
+            } catch (TwitterException e) {
+                e.printStackTrace();  //To change body of catch statement use File | Settings | File Templates.
+            }
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+
+        }
+    }
+
+    class TwitterHomeTimelineTask extends AsyncTask<String, String, Boolean> {
+
+        @Override
+        protected void onPostExecute(Boolean result) {
+            twitterFragment.setSwipeContainer(false);
+            mergedFragment.setSwipeContainer(false);
+            mergedFragment.setContent(createMergedFeed());
+            //createMergedFeed();
+        }
+
+        @Override
+        protected Boolean doInBackground(String... params) {
+
+            try {
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+                String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, "");
+                String accessTokenSecret = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET, "");
+                // gets Twitter instance with default credentials
+                twitterFragment.clearList();
+                if (!StringUtil.isNullOrWhitespace(accessTokenString) && !StringUtil.isNullOrWhitespace(accessTokenSecret)) {
+                    AccessToken accessToken = new AccessToken(accessTokenString, accessTokenSecret);
+                    List<twitter4j.Status> statuses = TwitterUtil.getInstance().getTwitterFactory().getInstance(accessToken).getHomeTimeline();
+                    //twitter4j.Status status = TwitterUtil.getInstance().getTwitterFactory().getInstance(accessToken).updateStatus(params[0]);
+                    User user = TwitterUtil.getInstance().getTwitterFactory().getInstance(accessToken).verifyCredentials();
+                    Log.d("user", "Showing @" + user.getScreenName() + "'s home timeline.");
+                    for(twitter4j.Status status : statuses) {
+                        Date date = getTwitterDate(status.getCreatedAt().toString());
+                        date.getTime();
+                        Log.d("TEST", String.valueOf(date.getTime()));
+                        //Date date2 = status.getCreatedAt().getTime();
+                        //status.getCreatedAt().getTime();
+                        Log.d("statuses", "@" + status.getUser().getScreenName() + " - " + status.getText() + String.valueOf(date.getTime()));
+                        MediaEntity[] media = status.getMediaEntities(); //get the media entities from the status
+                        String url = "";
+                        Bitmap bitmap = null;
+                        for(MediaEntity m : media){ //search trough your entities
+                            //Log.d("links", Arrays.toString(m.getVideoVariants())); //get your url!
+
+                            MediaEntity.Variant[] videos = m.getVideoVariants();
+                            if(videos.length!=0) {
+                                for (MediaEntity.Variant video : videos) {
+                                    if (video.getContentType().equals("video/mp4")) {
+                                        Log.d("video", video.getUrl());
+                                        url = video.getUrl();
+                                        url = url.substring(0, url.length() - 6); //removes tag at end
+                                        break; //only want first
+                                    }
+                                }
+                            }else{
+                                url = m.getMediaURL();
+                                if(url.contains(".png")|| url.contains(".jpg")) { //NOT VERY GUD CODE GÖR MED ASYNC TASK
+                                    URL urlURL = new URL(url);
+                                    InputStream stream = urlURL.openConnection().getInputStream();
+                                    bitmap = BitmapFactory.decodeStream(stream);
+                                    stream.close();
+                                }
+                            }
+                        }
+                        PostTest postTest = new PostTest(status.getText(), "", status.getUser().getScreenName(), bitmap, url, String.valueOf(date.getTime()), "Twitter", "");
+                        twitterFragment.addList(postTest);
+                    }
+                    mainActivity.runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            setRvContent(twitterFragment.getTwitterList());
+                        }
+                    });
+                    return true;
+                }
+            } catch (TwitterException te) {
+                te.printStackTrace();
+            } catch (ParseException e) {
+                e.printStackTrace();
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            return false;  //To change body of implemented methods use File | Settings | File Templates.
+
         }
     }
 }

@@ -89,9 +89,9 @@ public class RedditAdapter extends RecyclerView.Adapter<RedditAdapter.Holder> {
         holder.tvSubreddit.setText(content.get(position).getSubreddit());
         holder.tvUser.setText(content.get(position).getUser());
         if(content.get(position).getPlatform().equals("Reddit")) {
-            holder.ivPlatform.setImageResource(R.drawable.ic_reddit_filled_black_24dp);
+            holder.ivPlatform.setImageResource(R.drawable.ic_reddit_black_24dp);
         } else {
-            holder.ivPlatform.setImageResource(R.drawable.ic_twitter_filled_black_24dp);
+            holder.ivPlatform.setImageResource(R.drawable.ic_twitter_black_24dp);
         }
         //holder.tvPlatform.setText(content.get(position).getPlatform());
         holder.tvTitle.setText(content.get(position).getTitle());

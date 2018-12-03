@@ -6,13 +6,6 @@
     android:orientation="vertical"
     tools:context=".fragment.RedditFragment">
 
-    <Button
-        android:id="@+id/btnLoginReddit"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_weight="0"
-        android:text="Log in to reddit fragment" />
-
     <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"
         android:id="@+id/swipeContainer"

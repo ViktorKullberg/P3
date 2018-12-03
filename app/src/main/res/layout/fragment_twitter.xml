@@ -15,15 +15,22 @@
         android:layout_height="wrap_content"
         android:text="Update Status"
         android:id="@+id/textViewStatus" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+
     <EditText
+        android:id="@+id/editTextStatus"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:id="@+id/editTextStatus" android:layout_margin="10dp"/>
+        android:layout_margin="10dp"
+        android:textSize="14sp" />
+
     <Button
+        android:id="@+id/buttonUpdateStatus"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
         android:text="Tweet"
-        android:id="@+id/buttonUpdateStatus" android:layout_marginLeft="10dp" android:layout_marginRight="10dp"/>
+        android:textSize="10sp" />
 
     <Button
         android:id="@+id/buttonLogout"
@@ -31,7 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:text="Logout" />
+        android:text="Logout"
+        android:textSize="10sp" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         xmlns:android="http://schemas.android.com/apk/res/android"

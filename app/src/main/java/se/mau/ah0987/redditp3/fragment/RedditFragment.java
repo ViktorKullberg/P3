@@ -32,7 +32,6 @@ import se.mau.ah0987.redditp3.entity.PostTest;
 public class RedditFragment extends Fragment {
     private OnOptionsItemSelectedListener listener;
     private Controller controller;
-    private Button logInReddit;
     private RedditAdapter redditAdapter;
     private RecyclerView recyclerView;
     private List<PostTest> posts = new ArrayList<PostTest>();
@@ -51,18 +50,11 @@ public class RedditFragment extends Fragment {
                              Bundle savedInstanceState) {
         setHasOptionsMenu(true);
         View view = inflater.inflate(R.layout.fragment_reddit, container, false);
-        logInReddit = view.findViewById(R.id.btnLoginReddit);
         recyclerView = view.findViewById(R.id.rlistReddit);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new MyItemDecoration(getContext()));
         redditAdapter = new RedditAdapter(getActivity(), posts);
         recyclerView.setAdapter(redditAdapter);
-        logInReddit.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                controller.loginReddit();
-            }
-        });
 
         swipeContainer = view.findViewById(R.id.swipeContainer);
         // Setup refresh listener which triggers new data loading

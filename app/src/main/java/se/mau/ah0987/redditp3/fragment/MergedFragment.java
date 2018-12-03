@@ -3,6 +3,7 @@ package se.mau.ah0987.redditp3.fragment;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -30,8 +31,8 @@ public class MergedFragment extends Fragment {
     private RedditAdapter redditAdapter;
     private List<PostTest> content = new ArrayList<>();
     private Controller controller;
-    private TextView tvReddit;
-    private TextView tvTwitter;
+    private TwitterFragment twitterFragment;
+    private SwipeRefreshLayout swipeContainer;
 
     public MergedFragment() {
         // Required empty public constructor
@@ -40,15 +41,35 @@ public class MergedFragment extends Fragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.fragment_merged, container, false);
-        tvTwitter = view.findViewById(R.id.tvTwitterInfo);
-        tvReddit = view.findViewById(R.id.tvRedditInfo);
-        tvReddit.setText(controller.checkRedditLogin());
         recyclerView = view.findViewById(R.id.rvMerged);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
         recyclerView.addItemDecoration(new MyItemDecoration(getContext()));
         redditAdapter = new RedditAdapter(getActivity(), content);
         recyclerView.setAdapter(redditAdapter);
+
+        swipeContainer = (SwipeRefreshLayout) view.findViewById(R.id.swipeContainer);
+        // Setup refresh listener which triggers new data loading
+        swipeContainer.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                // Your code to refresh the list here.
+                // Make sure you call swipeContainer.setRefreshing(false)
+                // once the network request has completed successfully.
+                controller.getLastestPosts();
+                controller.twitterHomeTimeline();
+            }
+        });
+        // Configure the refreshing colors
+        swipeContainer.setColorSchemeResources(android.R.color.holo_blue_bright,
+                android.R.color.holo_green_light,
+                android.R.color.holo_orange_light,
+                android.R.color.holo_red_light);
+
         return view;
+    }
+
+    public void setSwipeContainer(Boolean bool) {
+        swipeContainer.setRefreshing(bool);
     }
 
     public void setContent(List<PostTest> content){
