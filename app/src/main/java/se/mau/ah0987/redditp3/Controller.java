@@ -105,6 +105,16 @@ public class Controller {
             ft.show(fragmentManager.findFragmentByTag(currentFragmentTag));
             ft.commit();
         }
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+        String redditAccessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_REDDIT_OAUTH_TOKEN, "");
+        String twitterAccessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_TWITTER_OAUTH_TOKEN, "");
+        if(twitterFragment.getTwitterList().isEmpty() && !twitterAccessTokenString.equals("")) {
+            twitterHomeTimeline();
+        }
+        if(redditFragment.getRedditList().isEmpty() && !redditAccessTokenString.equals("")) {
+            getLastestPosts();
+        }
+        mergedFragment.setContent(createMergedFeed());
     }
 
     public void onSaveInstanceState(Bundle outState) {
@@ -119,15 +129,24 @@ public class Controller {
                 switch (item.getItemId()) {
                     case R.id.navigation1_merged:
                         showFragment("MergedFragment");
+                        if(twitterFragment.getTwitterList().isEmpty()) {
+                            twitterHomeTimeline();
+                        }
+                        if(redditFragment.getRedditList().isEmpty()) {
+                            getLastestPosts();
+                        }
                         mergedFragment.setContent(createMergedFeed());
                         return true;
                     case R.id.navigation2_twitter:
                         showFragment("TwitterFragment");
                         if(twitterFragment.getTwitterList().isEmpty()) {
-                            twitterFragment.getTweets();
+                            twitterHomeTimeline();
                         }
                         return true;
                     case R.id.navigation3_reddit:
+                        if(redditFragment.getRedditList().isEmpty()) {
+                            getLastestPosts();
+                        }
                         showFragment("RedditFragment");
                         return true;
                 }
@@ -299,23 +318,36 @@ public class Controller {
             public void onResponse(Call call, Response response) throws IOException {
                 String json = response.body().string();
                 JSONObject data = null;
-                try {
-                    data = new JSONObject(json);
-                    accessToken = data.optString("access_token");
-                    refreshToken = data.optString("refresh_token");
-                    getLastestPosts(); //fetch the data
-                } catch (JSONException e) {
-                    e.printStackTrace();
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+                String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_REDDIT_OAUTH_TOKEN, "");
+                assert accessTokenString != null;
+                if(accessTokenString.equals("")) {
+                    try {
+                        data = new JSONObject(json);
+                        SharedPreferences.Editor editor = sharedPreferences.edit();
+                        editor.putString(ConstantValues.PREFERENCE_REDDIT_OAUTH_TOKEN, data.optString("access_token"));
+                        editor.commit();
+                        accessToken = data.optString("access_token");
+                        refreshToken = data.optString("refresh_token");
+                        getLastestPosts(); //fetch the data
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+                } else {
+                    getLastestPosts();
                 }
+
             }
         });
     }
 
     public void getLastestPosts(){
         OkHttpClient client = new OkHttpClient();
+        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(mainActivity.getApplicationContext());
+        String accessTokenString = sharedPreferences.getString(ConstantValues.PREFERENCE_REDDIT_OAUTH_TOKEN, "");
         Request request = new Request.Builder() //builds the request with acceesstoken
                 .url("https://oauth.reddit.com/new?count=0")
-                .addHeader("Authorization", "bearer "+ accessToken)
+                .addHeader("Authorization", "bearer "+ accessTokenString)
                 .get().build();
         Log.v("accestoken",request.toString());
         client.newCall(request).enqueue(new Callback(){

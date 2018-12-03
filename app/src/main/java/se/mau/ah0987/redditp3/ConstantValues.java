@@ -12,5 +12,6 @@ public class ConstantValues {
     public static String PREFERENCE_TWITTER_OAUTH_TOKEN_SECRET="TWITTER_OAUTH_TOKEN_SECRET";
     public static String PREFERENCE_TWITTER_IS_LOGGED_IN="TWITTER_IS_LOGGED_IN";
     public static String STRING_EXTRA_AUTHENCATION_URL = "AuthencationUrl";
+    public static String PREFERENCE_REDDIT_OAUTH_TOKEN = "REDDIT_OAUTH_TOKEN";
 }
 
